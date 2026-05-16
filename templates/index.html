@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>FoodVision AI</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Outfit',sans-serif;
+}
+
+body{
+    background:#0b1020;
+    min-height:100vh;
+    overflow-x:hidden;
+    color:white;
+    padding:30px;
+}
+
+/* Animated Background */
+
+.blob{
+    position:fixed;
+    border-radius:50%;
+    filter:blur(120px);
+    opacity:0.45;
+    z-index:-1;
+    animation:float 10s infinite alternate ease-in-out;
+}
+
+.blob1{
+    width:350px;
+    height:350px;
+    background:#ff8bd8;
+    top:-80px;
+    left:-80px;
+}
+
+.blob2{
+    width:350px;
+    height:350px;
+    background:#7cc7ff;
+    bottom:-100px;
+    right:-100px;
+}
+
+.blob3{
+    width:250px;
+    height:250px;
+    background:#b78cff;
+    top:40%;
+    left:45%;
+}
+
+@keyframes float{
+
+    100%{
+        transform:
+        translateY(40px)
+        translateX(20px);
+    }
+}
+
+.container{
+
+    max-width:1200px;
+    margin:auto;
+
+    background:
+    rgba(255,255,255,0.05);
+
+    backdrop-filter:blur(20px);
+
+    border-radius:35px;
+
+    padding:40px;
+
+    border:
+    1px solid rgba(255,255,255,0.08);
+
+    box-shadow:
+    0 0 60px rgba(0,0,0,0.2);
+}
+
+.logo{
+
+    font-size:58px;
+    font-weight:800;
+
+    background:
+    linear-gradient(
+    to right,
+    #ff9de2,
+    #8ec5fc,
+    #d0a8ff
+    );
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.subtitle{
+
+    margin-top:10px;
+    margin-bottom:40px;
+
+    color:#d7d4ff;
+
+    font-size:18px;
+}
+
+.upload-box{
+
+    border:
+    2px dashed rgba(255,255,255,0.15);
+
+    border-radius:30px;
+
+    padding:50px;
+
+    text-align:center;
+
+    background:
+    rgba(255,255,255,0.03);
+
+    transition:0.4s;
+}
+
+.upload-box:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:
+    0 0 40px rgba(255,110,199,0.08),
+    0 0 60px rgba(142,197,252,0.06);
+}
+
+.upload-box h2{
+
+    margin-bottom:20px;
+
+    font-size:30px;
+}
+
+input[type="file"]{
+
+    margin:15px;
+}
+
+input[type="number"]{
+
+    padding:14px 18px;
+
+    border:none;
+
+    outline:none;
+
+    border-radius:18px;
+
+    margin:10px;
+
+    background:
+    rgba(255,255,255,0.08);
+
+    color:white;
+
+    width:180px;
+}
+
+button{
+
+    padding:15px 40px;
+
+    border:none;
+
+    border-radius:50px;
+
+    background:
+    linear-gradient(
+    to right,
+    #8ec5fc,
+    #ff9de2
+    );
+
+    color:#111;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    margin-top:20px;
+
+    font-size:16px;
+
+    transition:0.3s;
+}
+
+button:hover{
+
+    transform:scale(1.05);
+
+    box-shadow:
+    0 0 30px rgba(255,255,255,0.2);
+}
+
+.result-card{
+
+    margin-top:45px;
+
+    display:grid;
+
+    grid-template-columns:1fr 1fr;
+
+    gap:30px;
+}
+
+.result-card img{
+
+    width:100%;
+
+    border-radius:28px;
+
+    height:500px;
+
+    object-fit:cover;
+
+    box-shadow:
+    0 10px 40px rgba(0,0,0,0.35);
+}
+
+.result-info{
+
+    background:
+    rgba(255,255,255,0.05);
+
+    padding:30px;
+
+    border-radius:30px;
+
+    box-shadow:
+    0 0 35px rgba(255,255,255,0.04);
+}
+
+.food-name{
+
+    font-size:48px;
+
+    font-weight:800;
+
+    letter-spacing:-1px;
+
+    margin-bottom:15px;
+
+    text-transform:capitalize;
+
+    background:
+    linear-gradient(
+    to right,
+    #ff9de2,
+    #8ec5fc
+    );
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.confidence{
+
+    font-size:18px;
+
+    color:#d7d0ff;
+
+    margin-bottom:25px;
+}
+
+/* Health Meter */
+
+.health-meter{
+
+    margin-bottom:30px;
+}
+
+.health-meter h3{
+
+    margin-bottom:12px;
+}
+
+.meter{
+
+    width:100%;
+
+    height:20px;
+
+    background:#1f2238;
+
+    border-radius:50px;
+
+    overflow:hidden;
+}
+
+.meter-fill{
+
+    height:100%;
+
+    width:75%;
+
+    border-radius:50px;
+
+    background:
+    linear-gradient(
+    to right,
+    #00ff99,
+    #ffee00,
+    #ff4d4d
+    );
+
+    animation:glow 3s infinite alternate;
+}
+
+@keyframes glow{
+
+    100%{
+        filter:brightness(1.2);
+    }
+}
+
+.nutrition-grid{
+
+    display:grid;
+
+    grid-template-columns:
+    repeat(2,1fr);
+
+    gap:18px;
+}
+
+.card{
+
+    background:
+    rgba(255,255,255,0.06);
+
+    padding:22px;
+
+    border-radius:24px;
+
+    text-align:center;
+
+    transition:0.3s;
+}
+
+.card:hover{
+
+    transform:translateY(-5px);
+
+    background:
+    rgba(255,255,255,0.1);
+}
+
+.card h3{
+
+    font-size:14px;
+
+    color:#d6d0ff;
+
+    margin-bottom:10px;
+}
+
+.card p{
+
+    font-size:24px;
+
+    font-weight:700;
+}
+
+/* Recommendation */
+
+.recommendation{
+
+    margin-top:28px;
+
+    background:
+    rgba(255,255,255,0.06);
+
+    padding:25px;
+
+    border-radius:24px;
+}
+
+.recommendation h3{
+
+    margin-bottom:10px;
+
+    color:#ffb4ea;
+}
+
+/* Analytics */
+
+.analytics{
+
+    margin-top:70px;
+}
+
+.analytics h2,
+.history h2{
+
+    margin-bottom:25px;
+
+    font-size:34px;
+
+    font-weight:800;
+
+    background:
+    linear-gradient(
+    to right,
+    #ff9de2,
+    #8ec5fc
+    );
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+.chart-box{
+
+    background:
+    rgba(255,255,255,0.04);
+
+    padding:20px;
+
+    border-radius:30px;
+
+    width:420px;
+    height:420px;
+
+    margin:auto;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    backdrop-filter:blur(20px);
+
+    border:
+    1px solid rgba(255,255,255,0.08);
+
+    box-shadow:
+    0 0 30px rgba(142,197,252,0.08),
+    0 0 50px rgba(255,110,199,0.06);
+}
+
+canvas{
+
+    max-width:320px !important;
+    max-height:320px !important;
+}
+
+/* History */
+
+.history{
+
+    margin-top:70px;
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    overflow:hidden;
+
+    border-radius:25px;
+
+    backdrop-filter:blur(20px);
+}
+
+th,td{
+
+    padding:18px;
+
+    text-align:center;
+}
+
+th{
+
+    background:
+    rgba(255,255,255,0.1);
+
+    font-size:15px;
+
+    letter-spacing:1px;
+}
+
+tr{
+
+    background:
+    rgba(255,255,255,0.03);
+
+    transition:0.3s;
+}
+
+tr:hover{
+
+    background:
+    rgba(255,255,255,0.08);
+
+    transform:scale(1.01);
+}
+
+td{
+
+    color:#e5e0ff;
+}
+
+/* Responsive */
+
+@media(max-width:900px){
+
+    .result-card{
+        grid-template-columns:1fr;
+    }
+
+    .nutrition-grid{
+        grid-template-columns:1fr;
+    }
+
+    .logo{
+        font-size:42px;
+    }
+
+    .food-name{
+        font-size:36px;
+    }
+
+    .chart-box{
+        width:100%;
+        height:auto;
+        padding:30px;
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="blob blob1"></div>
+<div class="blob blob2"></div>
+<div class="blob blob3"></div>
+
+<div class="container">
+
+    <h1 class="logo">
+        FoodVision AI
+    </h1>
+
+    <p class="subtitle">
+        AI-powered Nutrition & Calorie Intelligence ✨
+    </p>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <div class="upload-box">
+
+            <h2>
+                Upload Your Food 🍱
+            </h2>
+
+            <input type="file" name="image" required>
+
+            <br>
+
+            <input
+            type="number"
+            name="weight"
+            placeholder="Weight (kg)">
+
+            <input
+            type="number"
+            name="height"
+            placeholder="Height (cm)">
+
+            <br>
+
+            <button type="submit">
+                Analyze Food
+            </button>
+
+        </div>
+
+    </form>
+
+    {% if result %}
+
+    <div class="result-card">
+
+        <img src="{{ result.image }}">
+
+        <div class="result-info">
+
+            <h2 class="food-name">
+                {{ result.food }}
+            </h2>
+
+            <div class="confidence">
+                Confidence:
+                {{ result.confidence }}%
+            </div>
+
+            <div class="health-meter">
+
+                <h3>
+                    Health Meter
+                </h3>
+
+                <div class="meter">
+
+                    <div class="meter-fill"></div>
+
+                </div>
+
+            </div>
+
+            <div class="nutrition-grid">
+
+                <div class="card">
+                    <h3>Calories</h3>
+                    <p>{{ result.calories }}</p>
+                </div>
+
+                <div class="card">
+                    <h3>Protein</h3>
+                    <p>{{ result.protein }}</p>
+                </div>
+
+                <div class="card">
+                    <h3>Carbs</h3>
+                    <p>{{ result.carbs }}</p>
+                </div>
+
+                <div class="card">
+                    <h3>Fat</h3>
+                    <p>{{ result.fat }}</p>
+                </div>
+
+            </div>
+
+            <div class="recommendation">
+
+                <h3>
+                    BMI Score
+                </h3>
+
+                <p>
+                    {{ result.bmi }}
+                </p>
+
+                <br>
+
+                <h3>
+                    Diet Recommendation
+                </h3>
+
+                <p>
+                    {{ result.recommendation }}
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+    <div class="analytics">
+
+        <h2>
+            Nutrition Analytics 📊
+        </h2>
+
+        <div class="chart-box">
+
+            <canvas id="calorieChart"></canvas>
+
+        </div>
+
+    </div>
+
+    <div class="history">
+
+        <h2>
+            Food History 🕒
+        </h2>
+
+        <table>
+
+            <tr>
+
+                <th>Food</th>
+                <th>Calories</th>
+                <th>Time</th>
+
+            </tr>
+
+            {% for item in history %}
+
+            <tr>
+
+                <td>{{ item.food }}</td>
+                <td>{{ item.calories }}</td>
+                <td>{{ item.time }}</td>
+
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+    </div>
+
+</div>
+
+<script>
+
+const ctx =
+document.getElementById('calorieChart');
+
+new Chart(ctx, {
+
+    type:'doughnut',
+
+    data:{
+
+        labels:[
+            'Protein',
+            'Carbs',
+            'Fat'
+        ],
+
+        datasets:[{
+
+            data:[30,45,25],
+
+            backgroundColor:[
+                '#8ec5fc',
+                '#ff9de2',
+                '#caa8f5'
+            ],
+
+            borderWidth:0,
+
+            hoverOffset:18
+        }]
+    },
+
+    options:{
+
+        responsive:true,
+
+        plugins:{
+
+            legend:{
+                labels:{
+                    color:'white',
+                    font:{
+                        size:14,
+                        family:'Outfit'
+                    }
+                }
+            }
+        },
+
+        cutout:'68%'
+    }
+});
+
+</script>
+
+</body>
+</html>
